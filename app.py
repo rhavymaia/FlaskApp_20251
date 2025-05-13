@@ -1,9 +1,26 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 import sqlite3
+from marshmallow import ValidationError
 
-from models.InstituicaoEnsino import InstituicaoEnsino
+from models.InstituicaoEnsino import InstituicaoEnsino, InstituicaoEnsinoSchema
+
+DATABASE = 'censoescolar.db'
 
 app = Flask(__name__)
+
+
+def getConnection():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+
+@app.teardown_appcontext
+def closeConnection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 @app.route("/")
@@ -18,9 +35,7 @@ def instituicoesResource():
 
     try:
         instituicoesEnsino = []
-
-        conn = sqlite3.connect('censoescolar.db')
-        cursor = conn.cursor()
+        cursor = getConnection().cursor()
         cursor.execute(
             'SELECT * FROM tb_instituicao')
         resultSet = cursor.fetchall()
@@ -38,8 +53,6 @@ def instituicoesResource():
 
     except sqlite3.Error as e:
         return jsonify({"mensagem": "Problema com o banco de dados."}), 500
-    finally:
-        conn.close()
 
     return jsonify(instituicoesEnsino), 200
 
@@ -63,16 +76,18 @@ def validarInstituicao(content):
 @app.post("/instituicoes")
 def instituicaoInsercaoResource():
     print("Post - Instituição")
-    instituicaoJson = request.get_json()
+    instituicaoEnsinoSchema = InstituicaoEnsinoSchema()
 
-    isValido = validarInstituicao(instituicaoJson)
-    if (isValido):
+    instituicaoData = request.get_json()
+
+    try:
+        instituicaoJson = instituicaoEnsinoSchema.load(instituicaoData)
 
         no_entidade = instituicaoJson['no_entidade']
         co_entidade = instituicaoJson['co_entidade']
         qt_mat_bas = instituicaoJson['qt_mat_bas']
 
-        conn = sqlite3.connect('censoescolar.db')
+        conn = getConnection()
         cursor = conn.cursor()
         cursor.execute(
             'INSERT INTO tb_instituicao (no_entidade, co_entidade, qt_mat_bas) VALUES(?, ?, ?)', (no_entidade, co_entidade, qt_mat_bas))
@@ -83,16 +98,26 @@ def instituicaoInsercaoResource():
         instituicaoEnsino = InstituicaoEnsino(
             id, no_entidade, co_entidade, qt_mat_bas)
 
-        conn.close()
-
         return jsonify(instituicaoEnsino.toDict()), 200
+
+    except ValidationError as err:
+        return jsonify(err.messages), 400
+    except sqlite3.Error as e:
+        return jsonify({"mensagem": "Problema com o banco de dados."}), 500
 
     return jsonify({"mensagem": "Não cadastrado"}), 406
 
 
 @app.route("/instituicoes/<int:id>", methods=["DELETE"])
 def instituicaoRemocaoResource(id):
-    pass
+    try:
+        conn = getConnection()
+        c = conn.cursor()
+        c.execute('DELETE FROM tb_instituicao WHERE id = ?', (id,))
+        conn.commit()
+        return ({"mensagem": "Removido com sucesso."}, 200)
+    except sqlite3.Error as e:
+        return jsonify({"mensagem": "Problema com o banco de dados."}), 500
 
 
 @app.route("/instituicoes/<int:id>", methods=["PUT"])
@@ -108,8 +133,7 @@ def instituicaoAtualizacaoResource(id):
 @app.route("/instituicoes/<int:id>", methods=["GET"])
 def instituicoesByIdResource(id):
     try:
-        conn = sqlite3.connect('censoescolar.db')
-        cursor = conn.cursor()
+        cursor = getConnection().cursor()
         cursor.execute(
             'SELECT * FROM tb_instituicao WHERE id = ?', (id, ))
         row = cursor.fetchone()
@@ -125,7 +149,5 @@ def instituicoesByIdResource(id):
 
     except sqlite3.Error as e:
         return jsonify({"mensagem": "Problema com o banco de dados."}), 500
-    finally:
-        conn.close()
 
     return jsonify(instituicaoEnsino.toDict()), 200
