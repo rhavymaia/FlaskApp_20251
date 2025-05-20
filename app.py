@@ -1,26 +1,12 @@
-from flask import Flask, request, jsonify, g
+from flask import request, jsonify, g
 import sqlite3
 from marshmallow import ValidationError
 
+from helpers.application import app
+from helpers.database import getConnection
+from helpers.logging import logger
+
 from models.InstituicaoEnsino import InstituicaoEnsino, InstituicaoEnsinoSchema
-
-DATABASE = 'censoescolar.db'
-
-app = Flask(__name__)
-
-
-def getConnection():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-
-@app.teardown_appcontext
-def closeConnection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
 
 
 @app.route("/")
@@ -31,7 +17,7 @@ def index():
 
 @app.get("/instituicoes")
 def instituicoesResource():
-    print("Get - Instituições")
+    logger.info("Get - Instituições")
 
     try:
         instituicoesEnsino = []
@@ -42,6 +28,7 @@ def instituicoesResource():
 
         for row in resultSet:
             # Montar o conjunto de instituições.
+            logger.info(row)
             id = row[0]
             no_entidade = row[1]
             co_entidade = row[2]
