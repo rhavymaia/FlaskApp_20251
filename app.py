@@ -5,8 +5,11 @@ from marshmallow import ValidationError
 from helpers.application import app
 from helpers.database import getConnection
 from helpers.logging import logger
+from helpers.CORS import cors
 
 from models.InstituicaoEnsino import InstituicaoEnsino, InstituicaoEnsinoSchema
+
+cors.init_app(app)
 
 
 @app.route("/")
@@ -114,6 +117,9 @@ def instituicaoAtualizacaoResource(id):
         {"nome": "IFPB - Guarabira"},
         {"nome": "UEPB - Guarabira"}
     ]
+
+    # Verificar se o ID existe.
+    # Caso o item exista, atualize.
     return jsonify(instituicoes), 200
 
 
@@ -125,14 +131,17 @@ def instituicoesByIdResource(id):
             'SELECT * FROM tb_instituicao WHERE id = ?', (id, ))
         row = cursor.fetchone()
 
-        # Montar a de instituição.
-        id = row[0]
-        no_entidade = row[1]
-        co_entidade = row[2]
-        qt_mat_bas = row[3]
+        if row is not None:
+            # Montar a de instituição.
+            id = row[0]
+            no_entidade = row[1]
+            co_entidade = row[2]
+            qt_mat_bas = row[3]
 
-        instituicaoEnsino = InstituicaoEnsino(
-            id, no_entidade, co_entidade, qt_mat_bas)
+            instituicaoEnsino = InstituicaoEnsino(
+                id, no_entidade, co_entidade, qt_mat_bas)
+        else:
+            return jsonify({"mensagem": "Instituição não encontrada."}), 404
 
     except sqlite3.Error as e:
         return jsonify({"mensagem": "Problema com o banco de dados."}), 500
