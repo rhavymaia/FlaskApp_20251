@@ -1,4 +1,12 @@
 from marshmallow import Schema, fields, validate
+from flask_restful import fields as flaskFields
+
+instituicao_fields = {
+    'id':   flaskFields.Integer,
+    'no_entidade':   flaskFields.String,
+    'co_entidade':   flaskFields.Integer,
+    'qt_mat_bas':   flaskFields.Integer,
+}
 
 
 class InstituicaoEnsino():
@@ -7,9 +15,6 @@ class InstituicaoEnsino():
         self.no_entidade = no_entidade
         self.co_entidade = co_entidade
         self.qt_mat_bas = qt_mat_bas
-
-    def toDict(self):
-        return {"id": self.id, "no_entidade": self.no_entidade, "co_entidade": self.co_entidade, "qt_mat_bas": self.qt_mat_bas}
 
 
 class InstituicaoEnsinoSchema(Schema):
