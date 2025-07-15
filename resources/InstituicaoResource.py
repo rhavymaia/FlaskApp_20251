@@ -54,13 +54,11 @@ class InstituicoesResource(Resource):
             conn = getConnection()
             cursor = conn.cursor()
             cursor.execute(
-                'INSERT INTO tb_instituicao (no_entidade, co_entidade, qt_mat_bas) VALUES(?, ?, ?)', (no_entidade, co_entidade, qt_mat_bas))
+                f"INSERT INTO tb_instituicao (no_entidade, co_entidade, qt_mat_bas) VALUES('{no_entidade}', {co_entidade}, {qt_mat_bas})")
             conn.commit()
 
-            id = cursor.lastrowid
-
             instituicaoEnsino = InstituicaoEnsino(
-                id, no_entidade, co_entidade, qt_mat_bas)
+                0, no_entidade, co_entidade, qt_mat_bas)
 
             return marshal(instituicaoEnsino, instituicao_fields), 200
 
