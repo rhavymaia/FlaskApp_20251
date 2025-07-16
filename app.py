@@ -1,8 +1,10 @@
 from flask import jsonify
 import sqlite3
 
+from models.Usuario import Usuario
+
 from helpers.application import app, api
-from helpers.database import getConnection
+from helpers.database import getConnection, db
 from helpers.logging import logger
 from helpers.CORS import cors
 
@@ -39,3 +41,7 @@ def instituicaoAtualizacaoResource(id):
     # Verificar se o ID existe.
     # Caso o item exista, atualize.
     return jsonify(instituicoes), 200
+
+
+with app.app_context():
+    db.create_all()
