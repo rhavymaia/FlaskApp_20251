@@ -3,6 +3,7 @@ import sqlite3
 
 from models.Pessoa import Pessoa
 from models.Aluno import Aluno
+from models.Professor import Professor
 
 
 from helpers.application import app, api

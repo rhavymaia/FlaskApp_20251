@@ -10,8 +10,9 @@ class Pessoa(db.Model):
     __tablename__ = "tb_pessoa"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    nome: Mapped[str] = mapped_column()
-    sobrenome: Mapped[str] = mapped_column()
+    nome: Mapped[str] = mapped_column(String)
+    sobrenome: Mapped[str] = mapped_column(String)
+    cpf: Mapped[str] = mapped_column(String(11))
     nascimento: Mapped[date] = mapped_column(Date)
     email: Mapped[str] = mapped_column(String)
     tipo: Mapped[str]
@@ -25,14 +26,15 @@ class Pessoa(db.Model):
         "polymorphic_on": "tipo",
     }
 
-    def __init__(self, nome: str, sobrenome: str, nascimento: date, email: str):
+    def __init__(self, nome: str, sobrenome: str, cpf: str, nascimento: date, email: str):
         self.nome = nome
         self.sobrenome = sobrenome
+        self.cpf = cpf
         self.nascimento = nascimento
         self.email = email
 
     def __repr__(self):
-        pass
+        return f"{self.__class__.__name__}({self.nome!r})"
 
 
 class Endereco(db.Model):
