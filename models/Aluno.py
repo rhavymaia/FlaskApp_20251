@@ -2,6 +2,17 @@ from models.Pessoa import Pessoa
 from datetime import date
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
+from flask_restful import fields as flaskFields
+
+aluno_fields = {
+    'id':   flaskFields.Integer,
+    'nome':   flaskFields.String,
+    'sobrenome':   flaskFields.String,
+    'cpf':   flaskFields.String,
+    'nascimento':   flaskFields.String,
+    'email':   flaskFields.String,
+    'matricula':   flaskFields.Integer
+}
 
 
 class Aluno(Pessoa):
