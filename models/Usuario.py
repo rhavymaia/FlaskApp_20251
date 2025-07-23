@@ -1,8 +1,7 @@
 from typing import List
 from datetime import date
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, Date, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import String, Date, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from helpers.database import db
 

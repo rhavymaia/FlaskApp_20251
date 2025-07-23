@@ -1,7 +1,9 @@
 from flask import jsonify
 import sqlite3
 
-from models.Usuario import Usuario
+from models.Pessoa import Pessoa
+from models.Aluno import Aluno
+
 
 from helpers.application import app, api
 from helpers.database import getConnection, db
