@@ -12,7 +12,7 @@ api.add_resource(IndexResource, '/')
 api.add_resource(InstituicoesResource, '/instituicoes')
 api.add_resource(InstituicaoResource, '/instituicoes/<int:id>')
 
-api.add_resource(AlunosResource, '/instituicoes')
+api.add_resource(AlunosResource, '/alunos')
 
 
 with app.app_context():
