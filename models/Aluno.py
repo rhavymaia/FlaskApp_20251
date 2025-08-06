@@ -22,6 +22,7 @@ class Aluno(Pessoa):
     id: Mapped[int] = mapped_column(
         ForeignKey("tb_pessoa.id"), primary_key=True)
     matricula: Mapped[str]
+    cre: Mapped[float]
 
     def __init__(self, nome: str, sobrenome: str, cpf: str, nascimento: date, email: str, matricula: str):
         super().__init__(nome, sobrenome, cpf, nascimento, email)

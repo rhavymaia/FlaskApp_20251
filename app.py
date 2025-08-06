@@ -13,7 +13,3 @@ api.add_resource(InstituicoesResource, '/instituicoes')
 api.add_resource(InstituicaoResource, '/instituicoes/<int:id>')
 
 api.add_resource(AlunosResource, '/alunos')
-
-
-with app.app_context():
-    db.create_all()
